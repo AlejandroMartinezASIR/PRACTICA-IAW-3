@@ -1,10 +1,10 @@
 ---
-- name: Instalacion de moodle
-  hosts: frontend
+- name: Instalar y configurar Moodle
+  hosts: all
   become: yes
 
   tasks:
-    - name: Ensure required packages are installed
+    - name: Asegurar que los paquetes requeridos están instalados
       apt:
         name:
           - apache2
@@ -12,11 +12,11 @@
           - wget
         state: present
 
-    - name: Enable Apache rewrite module
+    - name: Habilitar el módulo de reescritura de Apache
       command: a2enmod rewrite
-      notify: Restart Apache
+      notify: Reiniciar Apache
 
-    - name: Remove previous Moodle installation
+    - name: Eliminar instalación previa de Moodle
       file:
         path: "{{ item }}"
         state: absent
@@ -24,21 +24,21 @@
         - /tmp/v4.3.1.zip
         - /var/www/html/*
 
-    - name: Download Moodle source code
+    - name: Descargar el código fuente de Moodle
       get_url:
         url: https://github.com/moodle/moodle/archive/refs/tags/v4.3.1.zip
         dest: /tmp/v4.3.1.zip
 
-    - name: Extract Moodle archive
+    - name: Extraer el archivo de Moodle
       unarchive:
         src: /tmp/v4.3.1.zip
         dest: /tmp
         remote_src: yes
 
-    - name: Move Moodle files to /var/www/html
-      command: mv /tmp/moodle-4.3.1/* /var/www/html/
+    - name: Mover archivos de Moodle a /var/www/html
+      command: mv -T /tmp/moodle-4.3.1 /var/www/html
 
-    - name: Set correct ownership and permissions for Moodle
+    - name: Establecer propiedad y permisos correctos para Moodle
       file:
         path: /var/www/html
         owner: www-data
@@ -46,7 +46,7 @@
         mode: "0755"
         recurse: yes
 
-    - name: Create Moodle data directory
+    - name: Crear directorio de datos de Moodle
       file:
         path: /var/moodledata
         state: directory
@@ -54,7 +54,7 @@
         group: www-data
         mode: "0777"
 
-    - name: Update PHP configuration
+    - name: Actualizar configuración de PHP
       replace:
         path: "{{ item }}"
         regexp: ";max_input_vars = 1000"
@@ -62,39 +62,39 @@
       loop:
         - /etc/php/8.3/apache2/php.ini
         - /etc/php/8.3/cli/php.ini
-      notify: Restart Apache
+      notify: Reiniciar Apache
 
-    - name: Install Moodle
+    - name: Instalar Moodle
       command: >
         sudo -u www-data php /var/www/html/admin/cli/install.php
-        --lang={{ MOODLE_LANG }}
-        --wwwroot={{ MOODLE_WWWROOT }}
-        --dataroot={{ MOODLE_DATAROOT }}
-        --dbtype={{ MOODLE_DB_TYPE }}
-        --dbhost={{ BACKEND_PRIVATE_IP }}
-        --dbname={{ MOODLE_DB_NAME }}
-        --dbuser={{ MOODLE_DB_USER }}
-        --dbpass={{ MOODLE_DB_PASS }}
-        --fullname="{{ MOODLE_FULLNAME }}"
-        --shortname="{{ MOODLE_SHORTNAME }}"
-        --summary="{{ MOODLE_SUMMARY }}"
-        --adminuser={{ MOODLE_ADMIN_USER }}
-        --adminpass={{ MOODLE_ADMIN_PASS }}
-        --adminemail={{ MOODLE_ADMIN_EMAIL }}
+        --lang={{ moodle.MOODLE_LANG }}
+        --wwwroot={{ moodle.MOODLE_WWWROOT }}
+        --dataroot={{ moodle.MOODLE_DATAROOT }}
+        --dbtype={{ moodle.MOODLE_DB_TYPE }}
+        --dbhost={{ moodle.BACKEND_PRIVATE_IP }}
+        --dbname={{ moodle.MOODLE_DB_NAME }}
+        --dbuser={{ moodle.MOODLE_DB_USER }}
+        --dbpass={{ moodle.MOODLE_DB_PASS }}
+        --fullname="{{ moodle.MOODLE_FULLNAME }}"
+        --shortname="{{ moodle.MOODLE_SHORTNAME }}"
+        --summary="{{ moodle.MOODLE_SUMMARY }}"
+        --adminuser={{ moodle.MOODLE_ADMIN_USER }}
+        --adminpass={{ moodle.MOODLE_ADMIN_PASS }}
+        --adminemail={{ moodle.MOODLE_ADMIN_EMAIL }}
         --non-interactive
         --agree-license
 
-    - name: Configure Moodle settings
+    - name: Configurar ajustes de Moodle
       lineinfile:
         path: /var/www/html/config.php
         insertafter: "$CFG->admin"
         line: |
           $CFG->reverseproxy=1;
           $CFG->sslproxy=1;
-      notify: Restart Apache
+      notify: Reiniciar Apache
 
   handlers:
-    - name: Restart Apache
+    - name: Reiniciar Apache
       service:
         name: apache2
         state: reloaded

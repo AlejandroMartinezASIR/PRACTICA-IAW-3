@@ -17,34 +17,23 @@
         name: mysql-server
         state: present
 
-    - name: Instalamos el gestor de paquetes de Python pip3
-      apt: 
-        name: python3-pip
-        state: present
-
     - name: Instalamos el módulo de pymysql
-      pip:
-        name: pymysql
+      apt:
+        name: python3-pymysql
         state: present
-    
-    - name: Eliminar la base de datos existente
-      mysql_db:
-        name: "{{wordpress.MOODLE_DB_NAME}}"
-        state: absent
-        login_unix_socket: /var/run/mysqld/mysqld.sock
 
     - name: Crear una base de datos
       mysql_db:
-        name: "{{wordpress.MOODLE_DB_NAME}}"
+        name: "{{ moodle.MOODLE_DB_NAME}}"
         state: present
         login_unix_socket: /var/run/mysqld/mysqld.sock 
 
     - name: Crear el usuario de la base de datos
       mysql_user:         
-        name: "{{ wordpress.MOODLE_DB_USER }}"
-        password: "{{ wordpress.MOODLE_DB_PASSWORD }}"
-        priv: "{{ wordpress.MOODLE_DB_NAME }}.*:ALL"
-        host: "{{MYSQL.IP_CLIENT_MYSQL}}"
+        name: "{{ moodle.MOODLE_DB_USER }}"
+        password: "{{ moodle.MOODLE_DB_PASSWORD }}"
+        priv: "{{ moodle.MOODLE_DB_NAME }}.*:ALL"
+        host: "{{ MYSQL.IP_CLIENT_MYSQL }}"
         state: present
         login_unix_socket: /var/run/mysqld/mysqld.sock 
 
@@ -52,7 +41,7 @@
       replace:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regexp: 127.0.0.1
-        replace: "{{MYSQL.MYSQL_PRIV}}"
+        replace: "{{ MYSQL.MYSQL_PRIV }}"
 
     - name: Reiniciamos el servicio de base de datos
       service:
