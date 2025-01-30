@@ -11,14 +11,14 @@ moodle:
     MOODLE_TITLE: "IAW"
     MOODLE_ADMIN_USER: admin
     MOODLE_ADMIN_PASS: Usuario0?
-    MOODLE_ADMIN_EMAIL: admin@gmail.com
-    MOODLE_WWWROOT: "https://examenalejandroma.ddnsking.com"
+    MOODLE_ADMIN_EMAIL: demo@demo.es
+    MOODLE_WWWROOT: "https://dominio-amu.ddnsking.com"
     MOODLE_DATAROOT: /var/moodledata
     MOODLE_DIR: /var/www/html
     MOODLE_DB_TYPE: mysqli
-    MOODLE_FULLNAME: "Examen de IAW Moodle"
+    MOODLE_FULLNAME: "IAW Moodle"
     MOODLE_SHORTNAME: "IAW Moodle"
-    MOODLE_SUMMARY: "Este es el Moodle que hemos desplegado en el examen"
+    MOODLE_SUMMARY: "Este es el Moodle que hemos desplegado con ansile"
     MOODLE_DATA_DIR: /var/moodledata
     MOODLE_LANG: es
 

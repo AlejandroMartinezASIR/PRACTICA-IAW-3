@@ -1,6 +1,6 @@
 ---
 - name: Instalar y configurar Moodle
-  hosts: all
+  hosts: frontend
   become: yes
 
   tasks:
@@ -36,7 +36,8 @@
         remote_src: yes
 
     - name: Mover archivos de Moodle a /var/www/html
-      command: mv -T /tmp/moodle-4.3.1 /var/www/html
+      command: mv /tmp/moodle-4.3.1 /var/www/html
+      
 
     - name: Establecer propiedad y permisos correctos para Moodle
       file:
@@ -67,20 +68,20 @@
     - name: Instalar Moodle
       command: >
         sudo -u www-data php /var/www/html/admin/cli/install.php
-        --lang={{ moodle.MOODLE_LANG }}
-        --wwwroot={{ moodle.MOODLE_WWWROOT }}
-        --dataroot={{ moodle.MOODLE_DATAROOT }}
-        --dbtype={{ moodle.MOODLE_DB_TYPE }}
-        --dbhost={{ moodle.BACKEND_PRIVATE_IP }}
-        --dbname={{ moodle.MOODLE_DB_NAME }}
-        --dbuser={{ moodle.MOODLE_DB_USER }}
-        --dbpass={{ moodle.MOODLE_DB_PASS }}
-        --fullname="{{ moodle.MOODLE_FULLNAME }}"
-        --shortname="{{ moodle.MOODLE_SHORTNAME }}"
-        --summary="{{ moodle.MOODLE_SUMMARY }}"
-        --adminuser={{ moodle.MOODLE_ADMIN_USER }}
-        --adminpass={{ moodle.MOODLE_ADMIN_PASS }}
-        --adminemail={{ moodle.MOODLE_ADMIN_EMAIL }}
+        --lang={{ MOODLE_LANG }}
+        --wwwroot={{ MOODLE_WWWROOT }}
+        --dataroot={{ MOODLE_DATAROOT }}
+        --dbtype={{ MOODLE_DB_TYPE }}
+        --dbhost={{ MOODLE_DB_HOST }}
+        --dbname={{ MOODLE_DB_NAME }}
+        --dbuser={{ MOODLE_DB_USER }}
+        --dbpass={{ MOODLE_DB_PASS }}
+        --fullname="{{ MOODLE_FULLNAME }}"
+        --shortname="{{ MOODLE_SHORTNAME }}"
+        --summary="{{ MOODLE_SUMMARY }}"
+        --adminuser={{ MOODLE_ADMIN_USER }}
+        --adminpass={{ MOODLE_ADMIN_PASS }}
+        --adminemail={{ MOODLE_ADMIN_EMAIL }}
         --non-interactive
         --agree-license
 
