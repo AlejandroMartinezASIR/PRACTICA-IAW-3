@@ -1,0 +1,33 @@
+---
+- name: Playbook para el lamp de Backend 
+  hosts: backend
+  become: yes
+
+  vars_files:
+    - ../vars/variables.yml
+  
+  tasks:
+  - name: Actualizamos los paquetes
+    apt:
+      update_cache: yes
+  
+  - name: Instalamos MySQL Server
+    apt:
+      name: mysql-server
+      state: present
+  
+  - name: Instalamos el módulo de pymysql
+    apt:
+      name: python3-pymysql
+      state: present
+
+  - name: Cambiamos para que solo se pueda conectar al mysql la maquina frontend
+    replace:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: 127.0.0.1
+      replace: 0.0.0.0
+  
+  - name: Reiniciamos el servicio de mysql
+    service:
+      name: mysql
+      state: restarted

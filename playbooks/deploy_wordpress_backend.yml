@@ -1,0 +1,45 @@
+---
+- name: Playbook para el deploy de wordpress en Backend
+  hosts: backend
+  become: yes
+
+  vars_files:
+  - ../vars/variables.yml
+
+  tasks:
+  - name: Borramos la base de datos de Wordpress
+    mysql_db:
+      name: "{{wordpress.db.name}}"
+      state: absent
+      login_user: root
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+  - name: Creamos la bases de datos de Wordpress 
+    mysql_db:
+      name: "{{wordpress.db.name}}"
+      state: present
+      login_user: root
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+  - name: Borramos los usuarios de la base de datos de Wordpress
+    mysql_user:
+      name: "{{wordpress.db.user}}"
+      host: "{{nfs.frontend_network}}"
+      state: absent
+      login_user: root
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+  - name: Creamos los usuarios de la base de datos de Wordpress
+    mysql_user:
+      name: "{{wordpress.db.user}}"
+      password: "{{wordpress.db.password}}"
+      host: "{{nfs.frontend_network}}" 
+      priv: "{{wordpress.db.name}}.*:ALL"
+      state: present
+      login_user: root
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+  - name: Reiniciamos el servicio mysql
+    service:
+      name: mysql
+      state: restarted

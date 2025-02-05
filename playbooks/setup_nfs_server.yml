@@ -1,0 +1,41 @@
+---
+- name: Playbook para el setup NFS del Server
+  hosts: nfs_server
+  become: yes
+
+  vars_files:
+  - ../vars/variables.yml
+
+  tasks:
+  - name: Instalamos el NFS Server
+    apt:
+      name: nfs-kernel-server
+      state: present
+  
+  - name: Creamos el directorio en el que vamos a compartir, en este caso en /var/www/html
+    file:
+      path: /var/www/html
+      state: directory
+      owner: nobody
+      group: nogroup
+      mode: 0770
+      recurse: yes 
+  
+  - name: Exportamos nuestro archivo de configuración
+    copy:
+      src: ../nfs/exports
+      dest: /etc/exports
+      mode: 0644
+      owner: root
+      group: root
+  
+  - name: Establecemos el rango de ip que podran montar nuestro directorio
+    replace:
+      path: /etc/exports
+      regexp: "FRONTEND_NETWORK"
+      replace: "{{nfs.frontend_network}}"
+  
+  - name: Reiniciamos el servicio de NFS
+    service:
+      name: nfs-kernel-server
+      state: restarted

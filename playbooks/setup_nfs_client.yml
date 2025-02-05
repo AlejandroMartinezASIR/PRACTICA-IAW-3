@@ -1,0 +1,30 @@
+---
+- name: Playbook para el NFS Client 
+  hosts: frontend
+  become: yes
+
+  vars_files:
+  - ../vars/variables.yml
+
+  tasks:
+  - name: Instalamos el NFS Server
+    apt:
+      name: nfs-kernel-server
+      state: present
+
+  - name: Añadimos el NFS de montaje a /etc/fstab
+    lineinfile:
+      path: /etc/fstab
+      line: "{{ nfs.nfs_server_ip }}:/var/www/html /var/www/html nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0"
+      insertafter: "LABEL=UEFI"
+
+  - name: Reiniciamos el servico daemon
+    systemd:
+      daemon_reload: yes 
+  
+  - name: Montamos el NFS
+    mount:
+      path: /var/www/html
+      src: "{{ nfs.nfs_server_ip }}:/var/www/html"
+      fstype: nfs
+      state: mounted

@@ -1,0 +1,27 @@
+certbot:
+  domain: "dominio-amu.ddnsking.com"
+  email: "amaruceb@iescelia.org"
+
+wordpress:
+  directory: "/var/www/html"
+  user: "amaruceb"
+  pass: "a"
+  titulo: "IAW"
+  hide_login_url: "noimporta"
+  db:
+    name: "wp_amu"
+    user: "amaruceb"
+    password: "Usuario0?"
+
+mysql: 
+  backend_private_ip: "172.31.6.116"
+  frontend1_private_ip: "172.31.15.194"
+  frontend2_private_ip: "172.31.7.63"
+
+loadbalancer:
+  ip_fronted_1: "172.31.15.194"
+  ip_fronted_2: "172.31.7.63"
+
+nfs:
+  frontend_network: "172.31.0.0/16"
+  nfs_server_ip: "172.31.5.24"

@@ -1,0 +1,88 @@
+---
+- name: Playbook para el deploy de wordpress en frontend
+  hosts: frontend
+  become: yes
+
+
+  vars_files:
+  - ../vars/variables.yml
+
+  tasks:
+  - name: Quitamos el wp-cli
+    file:
+      path: "/tmp/wp-cli.phar"
+      state: absent
+
+  - name: Descargamos el wp-cli
+    get_url:
+      url: "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+      dest: "/tmp/wp-cli.phar"
+      mode: '0755'
+
+  - name: movemos el wp-cli a la carpeta wp
+    command: mv /tmp/wp-cli.phar /usr/local/bin/wp
+    args:
+      creates: /usr/local/bin/wp
+
+  - name: Damos permisos al /usr/local/bin/wp
+    file:
+      path: /usr/local/bin/wp
+      mode: 775
+
+  - name: Creamos el directorio de wordpress
+    file:
+      path: "{{ wordpress.directory }}"
+      state: directory
+      owner: www-data
+      group: www-data
+      mode: '0755'
+
+  - name: Descargamos wordpress
+    command: wp core download --locale=es_ES --path={{ wordpress.directory }} --allow-root
+
+  - name: Creamos el archivo de configuración
+    command: wp config create --dbname={{ wordpress.db.name }} --dbuser={{ wordpress.db.user }} --dbpass={{ wordpress.db.password }} --dbhost={{ mysql.backend_private_ip }} --path={{ wordpress.directory }} --allow-root
+
+  - name: Instalamos Wordpress con el titulo y el usuario
+    command: wp core install --url={{ certbot.domain }} --title={{ wordpress.titulo }} --admin_user={{ wordpress.user }} --admin_password={{ wordpress.pass }} --admin_email={{ certbot.email }} --path={{ wordpress.directory }} --allow-root  
+
+  - name: Cambiamos el dueño a www-data
+    file:
+      path: "{{ wordpress.directory }}"
+      state: directory
+      recurse: yes
+      owner: www-data
+      group: www-data
+
+  - name: Instalamos un tema
+    command: wp theme install mindscape --activate --path={{ wordpress.directory }} --allow-root
+
+  - name: Configuramos los enlaces
+    command: wp rewrite structure '/%postname%/' --path={{ wordpress.directory }} --allow-root
+
+  - name: Instalamos un plugin
+    command: wp plugin install wps-hide-login --activate --path={{ wordpress.directory }} --allow-root
+  
+  - name: Configuramos el plugin
+    command: wp option update whl_page {{ wordpress.hide_login_url }} --path={{ wordpress.directory }} --allow-root
+
+  - name: Copiamos el archivo .htaccess
+    copy:
+      src: ../htaccess/.htaccess
+      dest: "{{ wordpress.directory }}"
+      mode: 0755
+
+  - name: Habilitamos https en el directorio
+    lineinfile:
+      path: "{{ wordpress.directory }}/wp-config.php"
+      insertafter: "COLLATE"
+      line: "$_SERVER['HTTPS'] = 'on';"
+      state: present   
+  
+  - name: Cambiamos los permisos de root a www-data
+    file:
+        path: "{{ wordpress.directory }}"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
