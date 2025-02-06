@@ -202,8 +202,8 @@ Estas son las **variables** que he utilizado
 
 ## Wordpress
 ### Pagina
-![wordpress](/home/ubuntu/PRACTICA-IAW-3/images/Captura.PNG)
+![wordpress](images/Captura.PNG)
 ### Hide login
-![hide-login](/home/ubuntu/PRACTICA-IAW-3/images/hide-login.PNG)
-### no-ip
-![no-ip](/home/ubuntu/PRACTICA-IAW-3/images/no-ip.PNG)
+![hide-login](images/hide-login.PNG)
+### No-ip
+![no-ip](images/no-ip.PNG)
