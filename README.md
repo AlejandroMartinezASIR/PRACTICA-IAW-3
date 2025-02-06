@@ -177,7 +177,7 @@ Estas son las **variables** que he utilizado
     - titulo: "IAW"
   
     - hide_login_url: "noimporta"
-    
+
 3. **db:**
     - name: "wp_amu"
     - user: "amaruceb"
@@ -199,3 +199,11 @@ Estas son las **variables** que he utilizado
     - frontend_network: "172.31.0.0/16"
   
     - nfs_server_ip: "172.31.5.24"
+
+## Wordpress
+### Pagina
+![wordpress](/home/ubuntu/PRACTICA-IAW-3/images/Captura.PNG)
+### Hide login
+![hide-login](/home/ubuntu/PRACTICA-IAW-3/images/hide-login.PNG)
+### no-ip
+![no-ip](/home/ubuntu/PRACTICA-IAW-3/images/no-ip.PNG)
