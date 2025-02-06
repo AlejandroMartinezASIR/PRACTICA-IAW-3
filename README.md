@@ -156,3 +156,46 @@ Este **playbook** de **Ansible** se encarga de instalar herramientas adicionales
     
     -   Utiliza el módulo `mysql_user` para crear un usuario dedicado a **phpMyAdmin** con privilegios en la base de datos recién creada.
 
+## VARIABLES.YML
+
+Estas son las **variables** que he utilizado
+
+1. **certbot:** 
+  
+    - domain: "dominio-amu.ddnsking.com"
+    
+    - email: "amaruceb@iescelia.org"
+
+2. **wordpress:**
+  
+    - directory: "/var/www/html"
+  
+    - user: "user"
+  
+    - pass: "a"
+  
+    - titulo: "IAW"
+  
+    - hide_login_url: "noimporta"
+    
+3. **db:**
+    - name: "wp_amu"
+    - user: "amaruceb"
+    - password: "a"
+
+4. **mysql:**
+  
+    - backend_private_ip: "172.31.6.116"
+  
+    - frontend1_private_ip: "172.31.15.194"
+    - frontend2_private_ip: "172.31.7.63"
+
+5. **loadbalancer:**
+    - ip_fronted_1: "172.31.15.194"
+    - ip_fronted_2: "172.31.7.63"
+
+6. **nfs:**
+  
+    - frontend_network: "172.31.0.0/16"
+  
+    - nfs_server_ip: "172.31.5.24"
