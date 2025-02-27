@@ -1,48 +1,39 @@
 ---
-- name: Playbook para el lamp en Frontend 
+- name: Playbook para instalar la pila LAMP en el FrontEnd
   hosts: frontend
   become: yes
 
-  vars_files:
-  - ../vars/variables.yml
-
   tasks:
-  - name: Actualizamos los repositorios
-    apt:
-      update_cache: yes
-  
-  - name: Instalamos Apache
-    apt:
-      name: apache2
-      state: present
-  
-  - name: Habilitamos el modulo rewrite
-    apache2_module:
-      name: rewrite
-      state: present
-  
-  - name: Copiamos el archivo de configuración de Apache
-    copy:
-      src: ../templates/000-default.conf
-      dest: /etc/apache2/sites-available
-  
-  - name: Instalamos PHP y algunos modulos extras
-    apt:
-      name:
-        - php
-        - libapache2-mod-php
-        - php-mysql
-      state: present
 
-  - name: Reiniciamos el servicio de Apache
-    service: 
-      name: apache2
-      state: restarted
+    - name: Actualizar los repositorios
+      apt:
+        update_cache: yes
 
-  - name: Modificamos el propietario y el grupo
-    file:
-      path: /var/www/html
-      owner: www-data
-      group: www-data
-      mode: 0755
-      recurse: yes 
+    - name: Instalar el servidor web Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Instalar PHP y los módulos necesarios
+      apt: 
+        name:
+          - php
+          - php-mysql
+          - libapache2-mod-php
+        state: present
+
+    - name: Copiar el archivo de configuración de Apache
+      copy:
+        src: ../templates/000-default.conf
+        dest: /etc/apache2/sites-available/
+        mode: 0755
+
+    - name: Habilitar el módulo rewrite de Apache
+      apache2_module:
+        name: rewrite
+        state: present
+
+    - name: Reiniciar el servidor web Apache
+      service:
+        name: apache2
+        state: restarted

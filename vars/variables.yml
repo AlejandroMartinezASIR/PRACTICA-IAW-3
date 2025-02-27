@@ -1,27 +1,35 @@
+db:
+    name: wp_db
+    user: wp_user
+    password: wp_pass
+
 certbot:
-  domain: "dominio-amu.ddnsking.com"
-  email: "amaruceb@iescelia.org"
+    email: admin@gmail.com
+    domain: wordpress-amu.ddnsking.com
 
-wordpress:
-  directory: "/var/www/html"
-  user: "amaruceb"
-  pass: "a"
-  titulo: "IAW"
-  hide_login_url: "noimporta"
-  db:
-    name: "wp_amu"
-    user: "amaruceb"
-    password: "Usuario0?"
+phpmyadmin:
+    user: pma_user
+    password: pma_password
+    db_name: db_name
 
-mysql: 
-  backend_private_ip: "172.31.6.116"
-  frontend1_private_ip: "172.31.15.194"
-  frontend2_private_ip: "172.31.7.63"
+FRONTEND_PRIVATE_IP: "172.31.%"
 
-loadbalancer:
-  ip_fronted_1: "172.31.15.194"
-  ip_fronted_2: "172.31.7.63"
+ip: 
+    frontend1: 172.31.39.202
+    frontend2: 172.31.38.157
 
-nfs:
-  frontend_network: "172.31.0.0/16"
-  nfs_server_ip: "172.31.5.24"
+FRONTEND_NETWORK: "172.31.0.0/16"
+NFS_SERVER_IP: "172.31.39.240"
+
+wordpress: 
+    directory: /var/www/html
+    db_name: wp_db
+    db_user: wp_user
+    db_password: wp_pass
+    db_host: 172.31.39.213
+    db_admin_user: admin
+    db_admin_pass: admin
+    db_admin_email: admin@gmail.com
+    hide_login: administrador
+    title: "APACHE"
+

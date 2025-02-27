@@ -1,0 +1,20 @@
+[frontend]
+3.212.22.133
+18.233.80.136
+
+[backend]
+34.228.243.81
+
+[frontend_unico]
+3.212.22.133
+
+[NFS]
+13.216.38.214
+
+[LoadBalancer]
+54.196.122.253
+
+[all:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=/home/ubuntu/PRACTICA-IAW-3\labsuser.pem
+ansible_ssh_common_args='-o StrictHostKeyChecking=accept-new'

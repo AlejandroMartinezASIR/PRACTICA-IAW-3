@@ -1,88 +1,100 @@
 ---
-- name: Playbook para el deploy de wordpress en frontend
-  hosts: frontend
+- name: Instalar y configurar WordPress con WP-CLI
+  hosts: frontend_unico
   become: yes
 
-
   vars_files:
-  - ../vars/variables.yml
+    - ../vars/variables.yml
 
   tasks:
-  - name: Quitamos el wp-cli
-    file:
-      path: "/tmp/wp-cli.phar"
-      state: absent
 
-  - name: Descargamos el wp-cli
-    get_url:
-      url: "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
-      dest: "/tmp/wp-cli.phar"
-      mode: '0755'
+    - name: Descargamos el WP-CLI
+      get_url:
+        url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        dest: /usr/local/bin/wp
+        mode: '0755'
 
-  - name: movemos el wp-cli a la carpeta wp
-    command: mv /tmp/wp-cli.phar /usr/local/bin/wp
-    args:
-      creates: /usr/local/bin/wp
-
-  - name: Damos permisos al /usr/local/bin/wp
-    file:
-      path: /usr/local/bin/wp
-      mode: 775
-
-  - name: Creamos el directorio de wordpress
-    file:
-      path: "{{ wordpress.directory }}"
-      state: directory
-      owner: www-data
-      group: www-data
-      mode: '0755'
-
-  - name: Descargamos wordpress
-    command: wp core download --locale=es_ES --path={{ wordpress.directory }} --allow-root
-
-  - name: Creamos el archivo de configuración
-    command: wp config create --dbname={{ wordpress.db.name }} --dbuser={{ wordpress.db.user }} --dbpass={{ wordpress.db.password }} --dbhost={{ mysql.backend_private_ip }} --path={{ wordpress.directory }} --allow-root
-
-  - name: Instalamos Wordpress con el titulo y el usuario
-    command: wp core install --url={{ certbot.domain }} --title={{ wordpress.titulo }} --admin_user={{ wordpress.user }} --admin_password={{ wordpress.pass }} --admin_email={{ certbot.email }} --path={{ wordpress.directory }} --allow-root  
-
-  - name: Cambiamos el dueño a www-data
-    file:
-      path: "{{ wordpress.directory }}"
-      state: directory
-      recurse: yes
-      owner: www-data
-      group: www-data
-
-  - name: Instalamos un tema
-    command: wp theme install mindscape --activate --path={{ wordpress.directory }} --allow-root
-
-  - name: Configuramos los enlaces
-    command: wp rewrite structure '/%postname%/' --path={{ wordpress.directory }} --allow-root
-
-  - name: Instalamos un plugin
-    command: wp plugin install wps-hide-login --activate --path={{ wordpress.directory }} --allow-root
-  
-  - name: Configuramos el plugin
-    command: wp option update whl_page {{ wordpress.hide_login_url }} --path={{ wordpress.directory }} --allow-root
-
-  - name: Copiamos el archivo .htaccess
-    copy:
-      src: ../htaccess/.htaccess
-      dest: "{{ wordpress.directory }}"
-      mode: 0755
-
-  - name: Habilitamos https en el directorio
-    lineinfile:
-      path: "{{ wordpress.directory }}/wp-config.php"
-      insertafter: "COLLATE"
-      line: "$_SERVER['HTTPS'] = 'on';"
-      state: present   
-  
-  - name: Cambiamos los permisos de root a www-data
-    file:
+    - name: Crear directorio de WordPress
+      file:
         path: "{{ wordpress.directory }}"
         state: directory
-        recurse: yes
         owner: www-data
         group: www-data
+        mode: '0755'
+
+    - name: Descargar WordPress
+      command: wp core download --locale=es_ES --path={{ wordpress.directory }} --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Crear archivo de configuración wp-config.php
+      command: >
+        wp config create
+        --dbname={{ wordpress.db_name }}
+        --dbuser={{ wordpress.db_user }}
+        --dbpass={{ wordpress.db_password }}
+        --dbhost={{ wordpress.db_host }}
+        --path={{ wordpress.directory }}
+        --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Instalación de WordPress
+      command: >
+        wp core install
+        --url={{ certbot.domain }}
+        --title="{{ wordpress.title }}"
+        --admin_user={{ wordpress.db_admin_user }}
+        --admin_password={{ wordpress.db_admin_pass }}
+        --admin_email={{ wordpress.db_admin_email }}
+        --path={{ wordpress.directory }}
+        --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Instalar y activar el tema Mindscape
+      command: wp theme install mindscape --activate --path={{ wordpress.directory }} --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Instalar y activar el plugin WPS Hide Login
+      command: wp plugin install wps-hide-login --activate --path={{ wordpress.directory }} --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Configurar la URL oculta del login
+      command: wp option update whl_page "{{ wordpress.hide_login }}" --path={{ wordpress.directory }} --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Configurar enlaces permanentes
+      command: wp rewrite structure '/%postname%/' --path={{ wordpress.directory }} --allow-root
+      args:
+        chdir: "{{ wordpress.directory }}"
+
+    - name: Copiar archivo .htaccess
+      copy:
+        src: ../htaccess/.htaccess
+        dest: "{{ wordpress.directory }}/.htaccess"
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Configurar HTTPS en wp-config.php
+      lineinfile:
+        path: "{{ wordpress.directory }}/wp-config.php"
+        insertafter: "COLLATE"
+        line: "$_SERVER['HTTPS'] = 'on';"
+        state: present
+
+    - name: Establecer permisos finales en WordPress
+      file:
+        path: "{{ wordpress.directory }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+  
+
+

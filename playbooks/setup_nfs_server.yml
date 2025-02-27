@@ -1,41 +1,47 @@
 ---
-- name: Playbook para el setup NFS del Server
-  hosts: nfs_server
+- name: Playbook para instalar NFS Server
+  hosts: NFS
   become: yes
 
   vars_files:
-  - ../vars/variables.yml
+    - ../vars/variables.yml
 
   tasks:
-  - name: Instalamos el NFS Server
-    apt:
-      name: nfs-kernel-server
-      state: present
-  
-  - name: Creamos el directorio en el que vamos a compartir, en este caso en /var/www/html
-    file:
-      path: /var/www/html
-      state: directory
-      owner: nobody
-      group: nogroup
-      mode: 0770
-      recurse: yes 
-  
-  - name: Exportamos nuestro archivo de configuración
-    copy:
-      src: ../nfs/exports
-      dest: /etc/exports
-      mode: 0644
-      owner: root
-      group: root
-  
-  - name: Establecemos el rango de ip que podran montar nuestro directorio
-    replace:
-      path: /etc/exports
-      regexp: "FRONTEND_NETWORK"
-      replace: "{{nfs.frontend_network}}"
-  
-  - name: Reiniciamos el servicio de NFS
-    service:
-      name: nfs-kernel-server
-      state: restarted
+
+    - name: Actualizar los repositorios
+      apt:
+        update_cache: yes
+
+    - name: Instalar el servidor NFS
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Creates directory
+      ansible.builtin.file:
+        path: /var/www/html
+        state: directory
+
+    - name: Modificamos los permisos del directorio /var/www/html
+      file:
+        path: /var/www/html
+        owner: nobody
+        group: nogroup
+        recurse: yes
+        mode: 0755
+    
+    - name: Copiamos el archivo de exports de NFS
+      copy:
+        src: ../nfs/exports
+        dest: /etc/exports
+
+    - name: Reemplazamos el valor de la plantilla de /etc/exports
+      replace: 
+        path: /etc/exports
+        regexp: 'FRONTEND_NETWORK'
+        replace: "{{ FRONTEND_NETWORK }}"
+
+    - name: Reiniciamos el servicio de base de datos
+      service:
+        name: nfs-kernel-server
+        state: restarted
