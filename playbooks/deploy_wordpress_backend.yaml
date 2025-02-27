@@ -1,27 +1,17 @@
 ---
-- name: Playbook para instalar la pila LAMP en el Backend
+- name: Despliegue de backend de wordpress
   hosts: backend
   become: yes
-
   vars_files:
-    - ../vars/variables.yml
-
+    - ../vars/variables.yaml
+    
   tasks:
-
-    - name: Actualizar los repositorios
-      apt:
-        update_cache: yes
-
-    - name: Instalar el sistema gestor de bases de datos MySQL
-      apt:
-        name: mysql-server
-        state: present
-
-    - name: Instalamos el módulo de pymysql
-      apt:
-        name: python3-pymysql
-        state: present
-
+    - name: Borrar la base de datos
+      mysql_db:
+        name: "{{ db.name }}"
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        
     - name: Crear una base de datos
       mysql_db:
         name: "{{ db.name }}"
@@ -31,9 +21,9 @@
     - name: Crear el usuario de la base de datos
       mysql_user:         
         name: "{{ db.user }}"
-        password: "{{ db.password }}"
+        password: "{{ db.pass }}"
         priv: "{{ db.name }}.*:ALL"
-        host: "{{ FRONTEND_PRIVATE_IP }}"
+        host: "{{ ip.net }}" #Aquí usamos la red completa 172.31.0.0/16
         state: present
         login_unix_socket: /var/run/mysqld/mysqld.sock 
 
@@ -41,7 +31,7 @@
       replace:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regexp: 127.0.0.1
-        replace: 172.31.45.90
+        replace: 0.0.0.0
 
     - name: Reiniciamos el servicio de base de datos
       service:

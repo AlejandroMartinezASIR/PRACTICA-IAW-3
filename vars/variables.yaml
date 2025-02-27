@@ -1,0 +1,24 @@
+cerbot:
+  email: amaruceb@e.educaand.es
+  url: wordpress-amu.ddnsking.com
+
+db:
+  user: alex
+  pass: 1234
+  name: wordpress
+
+ip:
+  front1: "172.31.41.118"
+  front2: "172.31.41.153"
+  back: "172.31.44.236"
+  net: "172.31.0.0/16"
+  nfsserver: "172.31.33.187"
+
+wp:
+  db_host: 172.31.44.236
+  path: /var/www/html
+  user: alex
+  pass: 1234
+  email: amaruceb@e.educaand.es
+  title: "APACHE"
+  nombre_secreto: administrador
