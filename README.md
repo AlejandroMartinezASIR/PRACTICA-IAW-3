@@ -201,6 +201,8 @@ Estas son las **variables** que he utilizado
     - nfs_server_ip: "172.31.5.24"
 
 ## Wordpress
+### Ansible
+![ansible](images/wordansible.png)
 ### Pagina
 ![wordpress](images/Captura.PNG)
 ### Hide login
