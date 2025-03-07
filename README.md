@@ -201,6 +201,8 @@ Estas son las **variables** que he utilizado
     - nfs_server_ip: "172.31.5.24"
 
 ## Wordpress
+### Maquinas
+![ansible](images/instancias222.png)
 ### Ansible
 ![ansible](images/wordansible.png)
 ### Pagina
@@ -208,4 +210,4 @@ Estas son las **variables** que he utilizado
 ### Hide login
 ![hide-login](images/hide-login.PNG)
 ### No-ip
-![no-ip](images/no-ip.PNG)
+![no-ip](images/noipa.png)
